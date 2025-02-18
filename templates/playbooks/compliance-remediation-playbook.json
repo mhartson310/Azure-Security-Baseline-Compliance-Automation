@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "$connections": {
+      "defaultValue": {},
+      "type": "Object"
+    }
+  },
+  "triggers": {
+    "When_NonCompliant_Resource_Detected": {
+      "type": "Request",
+      "kind": "Http",
+      "inputs": {
+        "schema": {}
+      }
+    }
+  },
+  "actions": {
+    "Evaluate_NonCompliance": {
+      "type": "Http",
+      "inputs": {
+        "method": "GET",
+        "uri": "https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/policyStates/latest/queryResults?api-version=2019-10-01"
+      }
+    },
+    "Apply_Remediation": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": {
+          "connection": {
+            "name": "@parameters('$connections')['azure_management']['connectionId']"
+          }
+        },
+        "method": "POST",
+        "path": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Resources/deployments",
+        "body": {
+          "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri": "https://yourstorageaccount.blob.core.windows.net/templates/arm-remediation-script.json",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {}
+          }
+        }
+      },
+      "runAfter": {
+        "Evaluate_NonCompliance": [ "Succeeded" ]
+      }
+    },
+    "Send_Remediation_Alert": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": {
+          "connection": {
+            "name": "@parameters('$connections')['office365']['connectionId']"
+          }
+        },
+        "method": "post",
+        "path": "/v2/Mail",
+        "body": {
+          "Message": {
+            "Subject": "Automated Compliance Remediation Executed",
+            "Body": {
+              "ContentType": "Text",
+              "Content": "A remediation action was triggered for non-compliant resources. Please review the changes."
+            },
+            "ToRecipients": [
+              {
+                "EmailAddress": {
+                  "Address": "compliance.team@example.com"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "runAfter": {
+        "Apply_Remediation": ["Succeeded"]
+      }
+    }
+  }
+}

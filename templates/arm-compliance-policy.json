@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "policyName": {
+      "type": "string",
+      "defaultValue": "EnforceEncryption",
+      "metadata": {
+        "description": "Name of the compliance policy."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/policyDefinitions",
+      "apiVersion": "2019-06-01",
+      "name": "[parameters('policyName')]",
+      "properties": {
+        "policyType": "BuiltIn",
+        "mode": "All",
+        "displayName": "Ensure that storage accounts have encryption enabled",
+        "description": "This policy audits whether storage accounts have encryption enabled.",
+        "metadata": {
+          "version": "1.0.0",
+          "category": "Security"
+        },
+        "parameters": {},
+        "policyRule": {
+          "if": {
+            "allOf": [
+              {
+                "field": "type",
+                "equals": "Microsoft.Storage/storageAccounts"
+              },
+              {
+                "field": "Microsoft.Storage/storageAccounts/encryption.services.blob.enabled",
+                "equals": "false"
+              }
+            ]
+          },
+          "then": {
+            "effect": "deny"
+          }
+        }
+      }
+    }
+  ]
+}

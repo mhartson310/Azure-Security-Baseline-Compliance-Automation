@@ -258,8 +258,5 @@ Embrace these best practices to safeguard your data and drive continuous improve
 - **Microsoft Compliance Manager:** [https://docs.microsoft.com/en-us/microsoft-365/compliance/compliance-manager-overview](https://docs.microsoft.com/en-us/microsoft-365/compliance/compliance-manager-overview)
 - **NIST Cybersecurity Framework:** [https://www.nist.gov/cyberframework](https://www.nist.gov/cyberframework)
 - **GDPR and HIPAA Compliance Guides:** [https://docs.microsoft.com/en-us/microsoft-365/compliance/regulatory](https://docs.microsoft.com/en-us/microsoft-365/compliance/regulatory)
-- **Azure CSPM and Cloud Security Blogs:** [Insert Your Blog Link Here]
 
----
 
-*Happy Securing & Automating!*
